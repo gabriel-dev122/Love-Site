@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Escaneia o coração 💗</title>
+    <meta name="description" content="Escaneie o QR code em forma de coração para abrir a sua surpresa." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --pink: #ff7aa2;
+        --deep: #b23a5f;
+        --cream: #fffaf6;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        font-family: "Quicksand", system-ui, sans-serif;
+        color: var(--deep);
+        background:
+          radial-gradient(120% 80% at 50% 0%, #fff6f9 0%, transparent 60%),
+          linear-gradient(180deg, #fdeef4 0%, #f9d9e5 100%);
+      }
+      .card {
+        width: 100%;
+        max-width: 380px;
+        background: var(--cream);
+        border-radius: 28px;
+        padding: 28px 24px 32px;
+        text-align: center;
+        box-shadow: 0 18px 40px -14px rgba(178, 58, 95, 0.35);
+      }
+      h1 { font-family: "Dancing Script", cursive; font-size: 38px; margin: 0 0 6px; }
+      p.sub { margin: 0 0 20px; font-size: 14px; opacity: 0.75; }
+      #qr {
+        display: grid;
+        place-items: center;
+        background: #fff;
+        border-radius: 18px;
+        padding: 16px;
+        margin: 0 auto 18px;
+        width: fit-content;
+      }
+      #qr img, #qr canvas { display: block; }
+      .link {
+        display: inline-block;
+        margin-top: 4px;
+        background: var(--pink);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 12px 26px;
+        border-radius: 999px;
+        letter-spacing: 0.04em;
+      }
+      .hint { margin: 16px 0 0; font-size: 12px; opacity: 0.65; word-break: break-all; }
+      .hearts { font-size: 18px; letter-spacing: 6px; margin-bottom: 8px; }
+      @media print { body { background: #fff; } .card { box-shadow: none; } }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <div class="hearts">💗 💗 💗</div>
+      <h1 id="title">Escaneia o coração</h1>
+      <p class="sub" id="subtitle">Aponte a câmera do celular para abrir a sua surpresa 💌</p>
+
+      <div id="qr" aria-label="QR code da surpresa"></div>
+
+      <a class="link" id="openLink" href="#">ABRIR A SURPRESA</a>
+      <p class="hint" id="urlText"></p>
+    </main>
+
+    <script>
+      /* ============================================================
+         👉 EDITE APENAS ESTAS 3 LINHAS
+         ============================================================ */
+      const SITE_URL = window.location.origin + "/"; // ou: "https://seusite.lovable.app/"
+      const TITULO = "Escaneia o coração";
+      const SUBTITULO = "Aponte a câmera do celular para abrir a sua surpresa 💌";
+      /* ============================================================ */
+
+      document.getElementById("title").textContent = TITULO;
+      document.getElementById("subtitle").textContent = SUBTITULO;
+      document.getElementById("openLink").href = SITE_URL;
+      document.getElementById("urlText").textContent = SITE_URL;
+
+      const img = document.createElement("img");
+      img.width = 240;
+      img.height = 240;
+      img.alt = "QR code para abrir a surpresa";
+      img.src =
+        "https://api.qrserver.com/v1/create-qr-code/?size=480x480&margin=0&color=FF4D7E&data=" +
+        encodeURIComponent(SITE_URL);
+      img.style.width = "240px";
+      img.style.height = "240px";
+      img.onerror = function () {
+        document.getElementById("qr").textContent = "Sem internet para gerar o QR — use o botão abaixo 💗";
+      };
+      document.getElementById("qr").appendChild(img);
+    </script>
+  </body>
+</html>

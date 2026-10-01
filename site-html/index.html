@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Feliz aniversário, Mariangel 💗</title>
+    <meta
+      name="description"
+      content="Um presente interativo: uma pergunta fofa, nossas fotos, a nossa música e uma carta escrita com todo o carinho."
+    />
+    <meta property="og:title" content="Feliz aniversário, Mariangel 💗" />
+    <meta property="og:description" content="Um presente interativo feito com as nossas memórias favoritas." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:wght@600;700&family=Quicksand:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* =========================================================
+         🎨 CORES E FONTES — mude aqui se quiser outro tom de rosa
+         ========================================================= */
+      :root {
+        --pink: #ff7aa2;
+        --pink-soft: #f9d3e0;
+        --rose: #c2325c;
+        --ink: #5c3244;
+        --cream: #fffaf6;
+        --yes: #4fbf7d;
+        --no: #e4573d;
+        --wa-bg: #0f1a1c;
+        --wa-bubble: #075e54;
+        --shadow: 0 14px 34px -12px rgba(194, 50, 92, 0.4);
+        --font-script: "Dancing Script", cursive;
+        --font-display: "Playfair Display", Georgia, serif;
+        --font-sans: "Quicksand", system-ui, -apple-system, sans-serif;
+      }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: var(--font-sans);
+        color: var(--ink);
+        background: #fdeef4;
+        overflow-x: hidden;
+      }
+      button { font-family: inherit; cursor: pointer; border: 0; }
+      img { display: block; max-width: 100%; }
+
+      .screen { display: none; min-height: 100vh; min-height: 100svh; position: relative; overflow: hidden; }
+      .screen.active { display: block; animation: screen-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+      .romance {
+        background:
+          radial-gradient(120% 80% at 50% 0%, #fff7fa 0%, transparent 60%),
+          linear-gradient(180deg, #fdeef4 0%, #f7cfdf 100%);
+      }
+      .center { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 20px; }
+      .wrap { position: relative; z-index: 10; width: 100%; max-width: 480px; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+
+      /* ---------- 1. Tela do WhatsApp ---------- */
+      #intro { background: var(--wa-bg); color: #fff; display: none; flex-direction: column; }
+      #intro.active { display: flex; }
+      .wa-head { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+      .wa-av { width: 38px; height: 38px; border-radius: 999px; background: rgba(255,122,162,0.3); display: grid; place-items: center; font-size: 18px; }
+      .wa-name { font-weight: 600; font-size: 15px; }
+      .wa-status { font-size: 11px; color: rgba(255,255,255,0.5); }
+      .wa-body { flex: 1; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 8px; padding: 24px 16px; }
+      .bubble {
+        background: var(--wa-bubble); color: #fff; padding: 9px 12px 7px; border-radius: 14px 14px 4px 14px;
+        max-width: 280px; font-size: 15px; animation: bubble-in 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+      }
+      .bubble .t { display: block; text-align: right; font-size: 10px; opacity: 0.65; margin-top: 2px; }
+      .qr-card {
+        position: relative; width: 100%; max-width: 280px; background: #fff; padding: 12px; border-radius: 12px;
+        box-shadow: 0 20px 40px -12px rgba(0,0,0,0.6); animation: qr-pop 0.7s cubic-bezier(0.34,1.56,0.64,1) both;
+        transition: transform 0.3s ease;
+      }
+      .qr-card:hover, .qr-card:focus-visible { transform: scale(1.04); }
+      .qr-card img { border-radius: 8px; width: 100%; }
+      .scanline { position: absolute; left: 12px; right: 12px; top: 14px; height: 3px; border-radius: 4px;
+        background: linear-gradient(90deg, transparent, #35e07a, transparent); animation: scan 2.6s ease-in-out infinite; }
+      .qr-hint { position: absolute; inset: 12px; display: grid; place-items: end center; padding-bottom: 8px;
+        font-size: 12px; font-weight: 700; color: var(--rose); opacity: 0; transition: opacity 0.3s; }
+      .qr-card:hover .qr-hint { opacity: 1; }
+      .corner { position: absolute; width: 18px; height: 18px; border: 3px solid var(--pink); }
+      .c1 { top: 6px; left: 6px; border-right: 0; border-bottom: 0; }
+      .c2 { top: 6px; right: 6px; border-left: 0; border-bottom: 0; }
+      .c3 { bottom: 6px; left: 6px; border-right: 0; border-top: 0; }
+      .c4 { bottom: 6px; right: 6px; border-left: 0; border-top: 0; }
+
+      /* ---------- 2. Pergunta ---------- */
+      .cat { width: 168px; animation: float 4s ease-in-out infinite; filter: drop-shadow(0 12px 20px rgba(194,50,92,0.25)); }
+      .cat.big { width: 200px; }
+      h1.msg { font-family: var(--font-display); font-size: 26px; color: var(--rose); text-align: center; margin: 0;
+        animation: message-in 0.45s cubic-bezier(0.22,1,0.36,1) both; }
+      .btn-row { position: relative; display: flex; align-items: center; justify-content: center; gap: 16px; min-height: 170px; width: 100%; }
+      .btn {
+        border-radius: 18px; padding: 15px 30px; font-weight: 700; font-size: 17px; letter-spacing: 0.04em; color: #fff;
+        box-shadow: var(--shadow); transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1);
+      }
+      #yes { background: var(--yes); z-index: 20; }
+      #no { background: var(--no); z-index: 10; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+      #yes:active { transform: scale(0.95); }
+
+      /* ---------- 3. Presentes ---------- */
+      .gifts { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+      .gift { background: none; display: flex; flex-direction: column; align-items: center; gap: 8px; animation: gift-idle 2.8s ease-in-out infinite; transition: transform 0.3s; }
+      .gift:hover { transform: translateY(-8px) scale(1.08); }
+      .box { position: relative; width: 78px; height: 70px; border-radius: 12px; background: linear-gradient(180deg, #ff9dbb, #f2688f); box-shadow: var(--shadow); }
+      .box::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 14px; margin-left: -7px; background: #fff; opacity: 0.85; }
+      .box::after { content: ""; position: absolute; left: 0; right: 0; top: 18px; height: 12px; background: #fff; opacity: 0.85; }
+      .bow { position: absolute; top: -16px; left: 50%; transform: translateX(-50%); font-size: 22px; animation: heartbeat 1.4s ease-in-out infinite; }
+      .gift span.lb { font-weight: 700; font-size: 12px; letter-spacing: 0.16em; color: var(--rose); }
+
+      /* ---------- 4. Fotos ---------- */
+      .title-script { font-family: var(--font-script); font-size: 38px; color: var(--rose); margin: 0 0 6px; text-align: center; }
+      .grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; width: 100%; max-width: 720px; margin: 0 auto; }
+      @media (min-width: 720px) { .grid { grid-template-columns: repeat(4, minmax(0,1fr)); } }
+      .polaroid {
+        background: #fff; padding: 8px 8px 26px; border-radius: 4px; box-shadow: 0 8px 20px -6px rgba(120,30,60,0.3);
+        animation: drop-in 0.7s cubic-bezier(0.34,1.4,0.64,1) both; transition: transform 0.3s;
+      }
+      .polaroid img { aspect-ratio: 3/4; object-fit: cover; width: 100%; border-radius: 2px; }
+      .polaroid:hover { transform: rotate(0deg) scale(1.07) !important; z-index: 5; position: relative; }
+      .cap { display: block; text-align: center; font-family: var(--font-script); font-size: 17px; color: var(--rose); margin-top: 4px; }
+      .label { font-family: var(--font-script); font-size: 22px; color: var(--rose); text-align: center; margin: 18px 0 0; }
+
+      /* ---------- 5. Música ---------- */
+      .player-row { display: flex; flex-direction: column; align-items: center; gap: 22px; width: 100%; max-width: 760px; }
+      @media (min-width: 800px) { .player-row { flex-direction: row; align-items: flex-start; justify-content: center; } }
+      .vinyl-box { background: rgba(249,211,224,0.7); border-radius: 26px; padding: 28px; box-shadow: var(--shadow); display: grid; place-items: center; }
+      .vinyl { width: 190px; height: 190px; border-radius: 999px; background: radial-gradient(circle, #2b2b2b 0 22%, #111 23% 100%); display: grid; place-items: center; box-shadow: 0 16px 30px -10px rgba(0,0,0,0.5); }
+      .vinyl.spin { animation: spin 6s linear infinite; }
+      .vinyl span { width: 62px; height: 62px; border-radius: 999px; background: var(--pink); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; display: grid; place-items: center; }
+      .card-player { background: rgba(249,211,224,0.7); border-radius: 26px; padding: 16px; box-shadow: var(--shadow); width: 100%; max-width: 360px; }
+      .thumb { position: relative; display: block; border-radius: 18px; overflow: hidden; }
+      .thumb img { aspect-ratio: 16/9; object-fit: cover; width: 100%; }
+      .thumb-info { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(30,10,20,0.35); color: #fff; text-align: center; }
+      .thumb-info b { font-family: var(--font-display); font-size: 26px; }
+      .thumb-info i { font-style: normal; font-size: 11px; letter-spacing: 0.3em; font-weight: 700; }
+      .yt { margin-top: 10px; background: #ff0033; width: 48px; height: 32px; border-radius: 7px; display: grid; place-items: center; color: #fff; transition: transform 0.25s; }
+      .thumb:hover .yt { transform: scale(1.15); }
+      .bar { height: 6px; border-radius: 999px; background: rgba(255,255,255,0.7); overflow: hidden; margin-top: 14px; }
+      .bar > div { height: 100%; width: 0%; background: var(--pink); border-radius: 999px; transition: width 0.2s linear; }
+      .times { display: flex; justify-content: space-between; font-size: 10px; color: rgba(194,50,92,0.75); margin-top: 4px; }
+      .controls { display: flex; align-items: center; justify-content: center; gap: 24px; margin-top: 12px; }
+      .controls button { background: none; color: var(--rose); font-size: 20px; transition: transform 0.2s; }
+      .controls button:hover { transform: scale(1.15); }
+      .play { width: 56px; height: 56px; border-radius: 999px; background: var(--pink) !important; color: #fff !important; box-shadow: var(--shadow); font-size: 20px !important; display: grid; place-items: center; }
+
+      /* ---------- 6. Carta ---------- */
+      .letter {
+        background: var(--cream); border-radius: 22px; padding: 30px 22px 34px; max-width: 640px; width: 100%;
+        box-shadow: var(--shadow); animation: letter-in 0.8s cubic-bezier(0.22,1,0.36,1) both; position: relative; z-index: 10;
+      }
+      @media (min-width: 640px) { .letter { padding: 44px 40px; } }
+      .letter h1 { font-family: var(--font-script); font-size: 40px; color: var(--rose); margin: 0 0 18px; }
+      .letter p { font-family: var(--font-display); font-size: 15.5px; line-height: 1.75; margin: 0 0 14px; animation: fade-up 0.6s ease-out both; }
+      .sign { text-align: right; font-family: var(--font-script); font-size: 26px; color: var(--rose); margin-top: 22px !important; }
+      .kiss { position: absolute; font-size: 28px; animation: kiss-in 0.6s ease-out both; opacity: 0.8; }
+
+      .back {
+        margin-top: 26px; background: var(--pink); color: #fff; font-weight: 700; letter-spacing: 0.14em; font-size: 13px;
+        padding: 13px 30px; border-radius: 999px; box-shadow: var(--shadow); transition: transform 0.2s; position: relative; z-index: 10;
+      }
+      .back:hover { transform: translateY(-3px) scale(1.05); }
+
+      .hearts { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+      .hearts span { position: absolute; bottom: -40px; animation: heart-rise 7s linear infinite; }
+
+      /* ---------- animações ---------- */
+      @keyframes screen-in { 0% { opacity: 0; transform: scale(0.94) translateY(18px); filter: blur(6px); } 100% { opacity: 1; transform: none; filter: none; } }
+      @keyframes bubble-in { 0% { opacity: 0; transform: translateY(14px) scale(0.85); } 100% { opacity: 1; transform: none; } }
+      @keyframes qr-pop { 0% { opacity: 0; transform: scale(0.6) rotate(-6deg); } 60% { opacity: 1; transform: scale(1.06) rotate(1.5deg); } 100% { opacity: 1; transform: none; } }
+      @keyframes scan { 0% { transform: translateY(0); opacity: 0; } 15%, 85% { opacity: 1; } 100% { transform: translateY(250px); opacity: 0; } }
+      @keyframes message-in { 0% { opacity: 0; transform: translateY(-10px) scale(0.9); } 100% { opacity: 1; transform: none; } }
+      @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes heart-rise { 0% { transform: translateY(0) scale(0.6) rotate(-10deg); opacity: 0; } 10% { opacity: 0.9; } 90% { opacity: 0.5; } 100% { transform: translateY(-110vh) scale(1.1) rotate(15deg); opacity: 0; } }
+      @keyframes gift-idle { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-8px) rotate(1.5deg); } }
+      @keyframes heartbeat { 0%, 100% { transform: translateX(-50%) scale(1); } 25% { transform: translateX(-50%) scale(1.18); } 40% { transform: translateX(-50%) scale(1); } 60% { transform: translateX(-50%) scale(1.12); } }
+      @keyframes drop-in { 0% { opacity: 0; transform: translateY(-60px) rotate(var(--tilt,0deg)) scale(0.8); } 70% { opacity: 1; transform: translateY(6px) rotate(var(--tilt,0deg)) scale(1.02); } 100% { opacity: 1; transform: rotate(var(--tilt,0deg)); } }
+      @keyframes kiss-in { 0% { opacity: 0; transform: rotate(var(--tilt,0deg)) scale(0.3); } 100% { opacity: 0.8; transform: rotate(var(--tilt,0deg)) scale(1); } }
+      @keyframes fade-up { 0% { opacity: 0; transform: translateY(16px); } 100% { opacity: 1; transform: none; } }
+      @keyframes letter-in { 0% { opacity: 0; transform: translateY(40px) scale(0.92) rotate(-1.5deg); } 100% { opacity: 1; transform: none; } }
+      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; } }
+    </style>
+  </head>
+  <body>
+    <!-- ================= 1. WHATSAPP ================= -->
+    <section id="intro" class="screen active">
+      <header class="wa-head">
+        <span style="opacity: 0.8">←</span>
+        <div class="wa-av">💗</div>
+        <div style="flex: 1; min-width: 0">
+          <div class="wa-name" id="waName"></div>
+          <div class="wa-status" id="waStatus"></div>
+        </div>
+        <span style="opacity: 0.7">📹 📞 🔍</span>
+      </header>
+      <div class="wa-body">
+        <div class="bubble" style="animation-delay: 0.15s">
+          <span id="waMsg1"></span><span class="t" id="waT1"></span>
+        </div>
+        <button class="qr-card" id="openBtn" style="animation-delay: 0.4s" aria-label="Abrir a surpresa">
+          <img src="midia/heart-qr.jpg" alt="QR code em forma de coração" width="480" height="480" />
+          <span class="scanline"></span>
+          <span class="corner c1"></span><span class="corner c2"></span>
+          <span class="corner c3"></span><span class="corner c4"></span>
+          <span class="qr-hint" id="waHint"></span>
+        </button>
+        <div class="bubble" style="animation-delay: 0.7s">
+          <span id="waMsg2"></span><span class="t" id="waT2"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 2. PERGUNTA ================= -->
+    <section id="question" class="screen romance center">
+      <div class="hearts" id="h1"></div>
+      <div class="wrap">
+        <img class="cat" id="catQ" src="midia/cat-shy.png" alt="Gatinho fofo" />
+        <h1 class="msg" id="qMsg"></h1>
+        <div class="btn-row">
+          <button class="btn" id="yes"></button>
+          <button class="btn" id="no"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 3. PRESENTES ================= -->
+    <section id="gifts" class="screen romance center">
+      <div class="hearts" id="h2"></div>
+      <div class="wrap">
+        <h1 class="msg" id="yesTitle"></h1>
+        <img class="cat big" src="midia/cat-heart.png" alt="Gatinho com um coração" />
+        <div class="gifts">
+          <button class="gift" data-go="gift1" style="animation-delay: 0.05s">
+            <span class="box"><span class="bow">🎀</span></span><span class="lb">PRESENTE 1</span>
+          </button>
+          <button class="gift" data-go="gift2" style="animation-delay: 0.25s">
+            <span class="box"><span class="bow">💗</span></span><span class="lb">PRESENTE 2</span>
+          </button>
+          <button class="gift" data-go="gift3" style="animation-delay: 0.45s">
+            <span class="box"><span class="bow">🎀</span></span><span class="lb">PRESENTE 3</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 4. FOTOS ================= -->
+    <section id="gift1" class="screen romance" style="padding: 40px 18px">
+      <div class="hearts" id="h3"></div>
+      <div style="position: relative; z-index: 10">
+        <h1 class="title-script" id="memTitle"></h1>
+        <div class="grid" id="photoGrid"></div>
+        <p class="label" id="memLabel"></p>
+        <div style="text-align: center"><button class="back" data-go="gifts">VOLTAR</button></div>
+      </div>
+    </section>
+
+    <!-- ================= 5. MÚSICA ================= -->
+    <section id="gift2" class="screen romance center">
+      <div class="hearts" id="h4"></div>
+      <div class="wrap" style="max-width: 800px">
+        <h1 class="title-script" id="songTitle"></h1>
+        <div class="player-row">
+          <div class="vinyl-box"><div class="vinyl" id="vinyl"><span id="vinylLabel"></span></div></div>
+          <div class="card-player">
+            <a class="thumb" id="ytLink" target="_blank" rel="noreferrer">
+              <img src="midia/capa-musica.jpg" alt="Capa da música" width="1024" height="576" loading="lazy" />
+              <span class="thumb-info">
+                <b id="trackTitle"></b><i id="artist"></i>
+                <span class="yt">▶</span>
+              </span>
+            </a>
+            <div class="bar"><div id="barFill"></div></div>
+            <div class="times"><span id="tNow">0:00</span><span id="tEnd"></span></div>
+            <div class="controls">
+              <button id="prev" aria-label="Voltar">⏮</button>
+              <button class="play" id="play" aria-label="Tocar">▶</button>
+              <button id="next" aria-label="Avançar">⏭</button>
+            </div>
+            <audio id="audio" preload="none"></audio>
+            <p style="font-size: 11px; text-align: center; color: rgba(194,50,92,0.7); margin: 10px 0 0" id="audioNote"></p>
+          </div>
+        </div>
+        <button class="back" data-go="gifts">VOLTAR</button>
+      </div>
+    </section>
+
+    <!-- ================= 6. CARTA ================= -->
+    <section id="gift3" class="screen romance" style="padding: 40px 18px">
+      <div id="kisses" style="position: absolute; inset: 0; overflow: hidden; pointer-events: none"></div>
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <article class="letter">
+          <h1 id="letterTitle"></h1>
+          <div id="letterBody"></div>
+          <p class="sign" id="letterSign"></p>
+        </article>
+        <button class="back" data-go="gifts">VOLTAR</button>
+      </div>
+    </section>
+
+    <script>
+      /* ==========================================================
+         💗 EDITE SÓ ESTE BLOCO PARA PERSONALIZAR O SITE 💗
+         Textos entre "aspas". Fotos: coloque na pasta midia/.
+         ========================================================== */
+      const CONFIG = {
+        whatsapp: {
+          nome: "Mariangel 💗",
+          status: "online",
+          msg1: "Feliz aniversário!! 🎂❤️",
+          hora1: "14:43",
+          msg2: "Abre quando estiver sozinha",
+          hora2: "14:44",
+          dica: "toque no coração 💗",
+        },
+        pergunta: {
+          titulo: "Você me ama? ❤️",
+          sim: "SIM",
+          nao: "NÃO",
+          // Cada vez que ela tenta clicar no NÃO, aparece a próxima frase.
+          passos: [
+            { texto: "Espera… tem certeza? 🥺", gato: "happy" },
+            { texto: "não, não é isso…", gato: "shy" },
+            { texto: "tenta de novo 😵‍💫", gato: "confused" },
+            { texto: "fala sério…", gato: "serious" },
+            { texto: "agora você só tá brincando…", gato: "shy" },
+            { texto: "ok, última chance…", gato: "happy" },
+          ],
+          tituloSim: "Eu sabia que você diria sim ❤️",
+        },
+        fotos: {
+          titulo: "Memórias capturadas",
+          legenda: "nós. em molduras 💗",
+          // Adicione ou tire fotos aqui (arquivos dentro da pasta midia/)
+          lista: [
+            "midia/foto-1.jpg", "midia/foto-2.jpg", "midia/foto-3.jpg", "midia/foto-4.jpg",
+            "midia/foto-5.jpg", "midia/foto-6.jpg", "midia/foto-7.jpg", "midia/foto-8.jpg",
+            "midia/foto-9.jpg", "midia/foto-10.jpg",
+          ],
+        },
+        musica: {
+          titulo: "Uma música que me lembra de nós",
+          nome: "MEDDLE ABOUT",
+          artista: "CHASE ATLANTIC",
+          selo: "ourstory",
+          duracao: "3:12",
+          link: "https://www.youtube.com/results?search_query=chase+atlantic+meddle+about",
+          // Salve o mp3 como midia/musica.mp3 para tocar dentro do site.
+          mp3: "midia/musica.mp3",
+        },
+        carta: {
+          titulo: "Para Mariangel 💗",
+          assinatura: "ass: Gabriel (Sukuna)",
+          paragrafos: [
+            "bom...vamos lá acho q pela primeira vez me esforcei pra algo, até dms mas adorei o resultado esse site foi muito difícil de fazer mas amei o resultado...",
+            "bom eu te desejo um feliz aniversário, desculpe ano passado n pude ir com vc pra seu aniversário de 15 anos, bom poha de doença, eu fico te devendo uma dança quando eu for ai vc pode me cobrar.",
+            "Mariagel, vc e uma garota muito especial pra mim, foi uma das melhores coisas q ja me aconteceram eu adorei todo esse tempo q eu passei ao seu lado tudo foi realmente muito especial, eu to tentando ao máximo conseguir te ver pra poder criar mais memorias boas, eu sempre tento me esforçar ao máximo . me desculpas pelas vezes q eu n conseguir demonstrar oq eu falo, vc sabe q eu realmente me esforço....",
+            "mas voltando ao ponto vc foi uma peça muito importante na minha vida, obrigado por cada momento, por cada palavra q vc ja me falou, por cada segundo q agente passou... tudo foi realmente muito importante pra mim n falo so da boca pra fora e oq eu realmente penso...",
+            "continue sendo essa pessoa maravilhosa q vc e fofa seja vc msm, seja a Mariangel q eu conheço fofa, gentil, educada, e muito inteligente... vc e especial do jeito q e n mude porque os outros acham q vc seria melhor assim e fds os outros, faça oq vc bem entender e fds as opiniões alheias, faz q nem eu amor vai por mim e muito bom..",
+            "eu espero muito q agente fique muito tempo juntos eu desejo isso, obrigado meu amor por tudo, eu te desejo um felize aniversário e q vc consuga fazer tudo oq tem vontade...",
+          ],
+        },
+      };
+      /* ====================== FIM DA PERSONALIZAÇÃO ====================== */
+
+      const $ = (id) => document.getElementById(id);
+
+      /* ---- navegação entre telas ---- */
+      function show(id) {
+        document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
+        const el = $(id);
+        el.classList.add("active");
+        window.scrollTo(0, 0);
+        if (id === "gift3") buildKisses();
+        if (id === "gift1") buildPhotos();
+      }
+      document.querySelectorAll("[data-go]").forEach((b) => b.addEventListener("click", () => show(b.dataset.go)));
+
+      /* ---- corações flutuantes ---- */
+      function hearts(box, n) {
+        const el = $(box);
+        if (!el) return;
+        let html = "";
+        for (let i = 0; i < n; i++) {
+          html += `<span style="left:${(i * 97) % 96}%;font-size:${14 + ((i * 7) % 20)}px;animation-delay:${(i * 0.7).toFixed(1)}s;animation-duration:${6 + (i % 5)}s">💗</span>`;
+        }
+        el.innerHTML = html;
+      }
+      ["h1", "h2", "h3", "h4"].forEach((h, i) => hearts(h, 10 + i * 2));
+
+      /* ---- 1. WhatsApp ---- */
+      const w = CONFIG.whatsapp;
+      $("waName").textContent = w.nome;
+      $("waStatus").textContent = w.status;
+      $("waMsg1").textContent = w.msg1;
+      $("waT1").textContent = w.hora1 + " ✓✓";
+      $("waMsg2").textContent = w.msg2;
+      $("waT2").textContent = w.hora2 + " ✓✓";
+      $("waHint").textContent = w.dica;
+      $("openBtn").addEventListener("click", () => show("question"));
+
+      /* ---- 2. Pergunta (botão NÃO que foge) ---- */
+      const q = CONFIG.pergunta;
+      let step = 0, last = 0;
+      $("yes").textContent = q.sim;
+      $("no").textContent = q.nao;
+      $("qMsg").textContent = q.titulo;
+
+      function render() {
+        const p = step === 0 ? null : q.passos[Math.min(step - 1, q.passos.length - 1)];
+        const msg = $("qMsg");
+        msg.textContent = p ? p.texto : q.titulo;
+        msg.style.animation = "none";
+        void msg.offsetWidth;
+        msg.style.animation = "";
+        $("catQ").src = "midia/cat-" + (p ? p.gato : "shy") + ".png";
+        $("yes").style.transform = "scale(" + Math.min(2.1, 1 + step * 0.18) + ")";
+      }
+      function dodge() {
+        const now = Date.now();
+        if (now - last < 120) return;
+        last = now;
+        const range = 70 + step * 12;
+        const x = Math.round((Math.random() * 2 - 1) * range);
+        const y = Math.round((Math.random() * 2 - 1) * range * 0.6);
+        step = Math.min(step + 1, q.passos.length);
+        $("no").style.transform = `translate(${x}px, ${y}px) scale(${Math.max(0.28, 1 - step * 0.12)}) rotate(${x / 8}deg)`;
+        render();
+      }
+      ["mouseenter", "touchstart", "click", "focus"].forEach((e) => $("no").addEventListener(e, dodge));
+      $("yes").addEventListener("click", () => show("gifts"));
+      $("yesTitle").textContent = q.tituloSim;
+
+      /* ---- 4. Fotos ---- */
+      let photosBuilt = false;
+      $("memTitle").textContent = CONFIG.fotos.titulo;
+      $("memLabel").textContent = CONFIG.fotos.legenda;
+      function buildPhotos() {
+        if (photosBuilt) return;
+        photosBuilt = true;
+        $("photoGrid").innerHTML = CONFIG.fotos.lista
+          .map((src, i) => {
+            const tilt = ((i * 37) % 10) - 5;
+            return `<figure class="polaroid" style="--tilt:${tilt}deg;transform:rotate(${tilt}deg);animation-delay:${(0.1 + i * 0.08).toFixed(2)}s;margin:0">
+              <img src="${src}" alt="Nossa memória ${i + 1}" loading="lazy" />
+              <span class="cap">💗</span></figure>`;
+          })
+          .join("");
+      }
+
+      /* ---- 5. Música ---- */
+      const m = CONFIG.musica;
+      $("songTitle").textContent = m.titulo;
+      $("trackTitle").textContent = m.nome;
+      $("artist").textContent = m.artista;
+      $("vinylLabel").textContent = m.selo;
+      $("tEnd").textContent = m.duracao;
+      $("ytLink").href = m.link;
+      const audio = $("audio");
+      audio.src = m.mp3;
+      let playing = false, fake = null, fakeP = 0;
+      let hasAudio = true;
+      audio.addEventListener("error", () => {
+        hasAudio = false;
+        $("audioNote").textContent = "Sem o arquivo midia/musica.mp3 — toque na capa para ouvir no YouTube 💗";
+      });
+      function setBar(p) { $("barFill").style.width = p + "%"; }
+      function toggle() {
+        playing = !playing;
+        $("play").textContent = playing ? "❚❚" : "▶";
+        $("vinyl").classList.toggle("spin", playing);
+        if (hasAudio) {
+          playing ? audio.play().catch(() => {}) : audio.pause();
+        } else {
+          if (playing) fake = setInterval(() => { fakeP = fakeP >= 100 ? 0 : fakeP + 0.5; setBar(fakeP); }, 200);
+          else clearInterval(fake);
+        }
+      }
+      $("play").addEventListener("click", toggle);
+      $("prev").addEventListener("click", () => { fakeP = 0; setBar(0); if (hasAudio) audio.currentTime = 0; });
+      $("next").addEventListener("click", () => { fakeP = 100; setBar(100); });
+      audio.addEventListener("timeupdate", () => {
+        if (audio.duration) {
+          setBar((audio.currentTime / audio.duration) * 100);
+          const s = Math.floor(audio.currentTime);
+          $("tNow").textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+        }
+      });
+      audio.addEventListener("ended", () => { playing = false; $("play").textContent = "▶"; $("vinyl").classList.remove("spin"); });
+
+      /* ---- 6. Carta ---- */
+      const c = CONFIG.carta;
+      $("letterTitle").textContent = c.titulo;
+      $("letterSign").textContent = c.assinatura;
+      $("letterBody").innerHTML = c.paragrafos
+        .map((p, i) => `<p style="animation-delay:${(0.35 + i * 0.18).toFixed(2)}s"></p>`)
+        .join("");
+      $("letterBody").querySelectorAll("p").forEach((el, i) => (el.textContent = c.paragrafos[i]));
+      let kissesBuilt = false;
+      function buildKisses() {
+        if (kissesBuilt) return;
+        kissesBuilt = true;
+        let html = "";
+        for (let i = 0; i < 22; i++) {
+          const tilt = ((i * 53) % 90) - 45;
+          html += `<span class="kiss" style="left:${(i * 43) % 94}%;top:${(i * 67) % 94}%;--tilt:${tilt}deg;transform:rotate(${tilt}deg);font-size:${26 + ((i * 11) % 24)}px;animation-delay:${((i % 11) * 0.06).toFixed(2)}s">💋</span>`;
+        }
+        $("kisses").innerHTML = html;
+      }
+    </script>
+  </body>
+</html>
